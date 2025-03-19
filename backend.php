@@ -26,15 +26,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
         // Get total accesses today
         if ($action == 'get_accesses_today') {
-            $today = date('Y-m-d'); // get today's date
-            $result = $conn->query("SELECT COUNT(*) AS total FROM access_logs WHERE DATE(waktu_akses) = '$today'");
+            $today = date('Y-m-d'); 
+            $result = $conn->query("SELECT COUNT(*) AS total FROM log_akses WHERE DATE(waktu_akses) = '$today'");
             $data = $result->fetch_assoc();
             echo json_encode(['total' => $data['total']]);
         }
 
         // Get total vehicles inside the parking lot
         if ($action == 'get_vehicles_inside') {
-            $result = $conn->query("SELECT COUNT(*) AS total FROM access_logs WHERE status = 'masuk' AND id NOT IN (SELECT id FROM access_logs WHERE status = 'keluar')");
+            $result = $conn->query("SELECT COUNT(*) AS total FROM log_akses WHERE status = 'masuk' AND id NOT IN (SELECT id FROM log_akses WHERE status = 'keluar')");
             $data = $result->fetch_assoc();
             echo json_encode(['total' => $data['total']]);
         }
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
         // Get logs
         if ($action == 'get_logs') {
-            $result = $conn->query("SELECT * FROM access_logs");
+            $result = $conn->query("SELECT * FROM log_akses");
             $logs = [];
             while ($row = $result->fetch_assoc()) {
                 $logs[] = $row;

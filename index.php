@@ -59,7 +59,7 @@
                     <h2>Log Akses Terbaru</h2>
                     <button class="btn btn-success">Ekspor Data</button>
                 </div>
-                <table>
+                <table id="dataLog">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -173,7 +173,7 @@
             fetch('backend.php?action=get_logs')
                 .then(response => response.json())
                 .then(data => {
-                    let tableBody = document.querySelector('.table-section table tbody');
+                    let tableBody = document.querySelector('#dataLog tbody');
                     tableBody.innerHTML = '';
                     data.forEach(log => {
                         let row = `<tr>

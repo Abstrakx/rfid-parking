@@ -11,28 +11,33 @@
     }
 
     if (isset($_GET['rfid'])) {
-        $rfid = $_GET['rfid'];
-        
-        // Cek apakah RFID terdaftar dan diizinkan masuk
-        $sql = "SELECT * FROM users WHERE rfid_code='$rfid'";
+        $rfid = $conn->real_escape_string($_GET['rfid']); // Prevent SQL Injection
+
+        // Cek apakah RFID terdaftar dan ambil nama
+        $sql = "SELECT nama FROM users WHERE rfid_code='$rfid'";
         $result = $conn->query($sql);
-        
+
         if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $nama = $row['nama']; 
+
             // Cek log terakhir pengguna
-            $log_sql = "SELECT status FROM log_akses WHERE rfid_code='$rfid' ORDER BY waktu DESC LIMIT 1";
+            $log_sql = "SELECT status FROM log_akses WHERE rfid_code='$rfid' ORDER BY waktu_akses DESC LIMIT 1";
             $log_result = $conn->query($log_sql);
-            
+
             if ($log_result->num_rows > 0) {
                 $last_status = $log_result->fetch_assoc()['status'];
                 $new_status = ($last_status == 'masuk') ? 'keluar' : 'masuk';
             } else {
-                $new_status = 'masuk'; 
+                $new_status = 'masuk';
             }
-            
-            // Simpan ke log akses
-            $conn->query("INSERT INTO log_akses (rfid_code, status, waktu) VALUES ('$rfid', '$new_status', NOW())");
 
-            echo "allowed";  
+            // Simpan ke log akses dengan nama
+            $insert_sql = "INSERT INTO log_akses (rfid_code, nama, status, waktu_akses) 
+                           VALUES ('$rfid', '$nama', '$new_status', NOW())";
+            $conn->query($insert_sql);
+
+            echo "allowed";
         } else {
             echo "denied";
         }
