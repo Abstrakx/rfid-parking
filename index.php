@@ -57,7 +57,6 @@
             <div class="table-section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2>Log Akses Terbaru</h2>
-                    <button class="btn btn-success">Ekspor Data</button>
                 </div>
                 <table id="dataLog">
                     <thead>

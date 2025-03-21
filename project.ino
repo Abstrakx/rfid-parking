@@ -5,6 +5,7 @@
 #include <HTTPClient.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
+#include <ESP32Servo.h>
 
 // Pin configuration for MFRC522 RFID
 #define RST_PIN  2
@@ -13,6 +14,13 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 // LCD setup (Address 0x27 is commonly used for 16x2 LCD with I2C)
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+// Servo & Buzzer configuration
+Servo servo;  
+ 
+
+int servoPin = 32;  
+int buzzerPin = 12;  
 
 // WiFi configuration
 const char* ssid = "Xiaomi Mi 6";
@@ -51,6 +59,10 @@ void setup() {
   SPI.begin();
   mfrc522.PCD_Init();
 
+  // Initialize Servo & Buzzer
+  servo.attach(servoPin);
+  pinMode(buzzerPin, OUTPUT);
+
   // Set up mDNS responder
   if (!MDNS.begin("rfidsystem")) {
     Serial.println("Error setting up MDNS responder!");
@@ -62,6 +74,8 @@ void setup() {
   setupWebServer();
   server.begin();
   Serial.println("HTTP server started");
+
+  servo.write(90);
 }
 
 void loop() {
@@ -160,6 +174,15 @@ void checkUserStatus(String rfid) {
       lcd.setCursor(0, 1);
       lcd.print("Thank You!");
       Serial.println("Access Granted");
+      
+      servo.write(0);
+      digitalWrite(buzzerPin, HIGH);
+
+      delay(2000);
+
+      servo.write(90);
+      digitalWrite(buzzerPin, LOW);
+
     } else {
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -202,7 +225,10 @@ void registerRFID(String name, String rfid) {
     lcd.print(payload == "success" ? "Successfully" : "Try Again");
     
     registerMode = false;
+    digitalWrite(buzzerPin, HIGH);
     delay(2000);
+    digitalWrite(buzzerPin, LOW);
+    
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Scan RFID Card");
